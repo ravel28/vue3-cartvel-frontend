@@ -1,6 +1,11 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
+import axios from 'axios';
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+const { appContext } = getCurrentInstance();
+const swal = appContext.config.globalProperties.$swal;
 
 const cardSignUp = ref(null);
 const cardSignIn = ref(null);
@@ -21,18 +26,30 @@ const formSignUp = ref({
   password: ''
 })
 
+const emit = defineEmits(['submit'])
+
 const signIn = async () => {
   try {
-    const response = await axios.post(import.meta.env.VITE_API_BASE_URL + '/users/login', formSignIn.value)
+    const dataUser = await axios.post(import.meta.env.VITE_API_BASE_URL + 'users/login', formSignIn.value)
+
+    const roleResult = dataUser.data.data.role;
+    localStorage.setItem('idUser', dataUser.data.data.idUser);
+    localStorage.setItem('isLogin', true);
+    localStorage.setItem('isUser', roleResult === 'USER' ? true : false);
+    await swal.fire('Berhasil', 'Data email dan password cocok.', 'success');
+    router.push('home/dashboard')
   } catch (error) {
-    console.error('Login failed:', error)
+    swal.fire('Error', 'Terjadi kesalahan saat login.', 'error')
+    router.push('/')
   }
   emit('submit', { ...formSignIn.value })
 }
 
 const signUp = async () => {
   try {
-    const response = await axios.post(import.meta.env.VITE_API_BASE_URL + '/users/login', formSignUp.value)
+    await axios.post(import.meta.env.VITE_API_BASE_URL + 'users/create', formSignUp.value)
+    await swal.fire('Berhasil', 'Data sudah tersimpan ! Silahkan masuk.', 'success')
+    toggleCard(false);
   } catch (error) {
     console.error('Login failed:', error)
   }
@@ -66,7 +83,7 @@ function toggleCard(formSignUp) {
                 <h2 class="font-bold text-2xl">{{ headerSignUp }}</h2>
               </div>
               <div class="body-card">
-                <form action="#">
+                <form action="#" @submit.prevent="signUp">
                   <div class="pb-3">
                     <input type="email" name="email" id="newEmail"
                       class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="email@gmail.com"
@@ -78,7 +95,7 @@ function toggleCard(formSignUp) {
                       required v-model="formSignUp.name" />
                   </div>
                   <div class="pb-3">
-                    <textarea name="name" id="newName"
+                    <textarea name="name" id="address"
                       class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="Your Address"
                       required v-model="formSignUp.address" />
                   </div>
@@ -121,24 +138,27 @@ function toggleCard(formSignUp) {
                 <h2 class="font-bold text-2xl">{{ headerSignIn }}</h2>
               </div>
               <div class="body-card">
-                <div class="pb-3">
-                  <input type="email" name="email" id="email"
-                    class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="email@gmail.com"
-                    required v-model="formSignIn.user" />
-                </div>
-                <div>
-                  <input type="password" name="pass" id="pass"
-                    class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="Your Password"
-                    required v-model="formSignIn.password" />
-                </div>
-                <button type="submit"
-                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mt-3">Login</button>
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-500">
-                  Belum punya akun ?
-                  <a href="#" class="text-blue-700 hover:underline dark:text-blue-500" @click="toggleCard(true)">
-                    Daftar aja !
-                  </a>
-                </div>
+                <form action="#" @submit.prevent="signIn">
+                  <div class="pb-3">
+                    <input type="email" name="email" id="email"
+                      class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="email@gmail.com"
+                      required v-model="formSignIn.email" />
+                  </div>
+                  <div>
+                    <input type="password" name="pass" id="pass"
+                      class="border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="Your Password"
+                      required v-model="formSignIn.password" />
+                  </div>
+                  <button type="submit"
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mt-3">Login</button>
+                  <div class="text-sm font-medium text-gray-500 dark:text-gray-500">
+                    Belum punya akun ?
+                    <a href="#" class="text-blue-700 hover:underline dark:text-blue-500" @click="toggleCard(true)">
+                      Daftar aja !
+                    </a>
+                  </div>
+                </form>
+
               </div>
             </div>
           </div>
