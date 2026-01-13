@@ -66,6 +66,10 @@ function toggleCard(formSignUp) {
   }
 
 }
+
+function home() {
+  router.push('/home/dashboard');
+}
 </script>
 
 <template>
@@ -133,7 +137,7 @@ function toggleCard(formSignUp) {
           </div>
           <div ref="cardSignIn"
             class="bg-white w-full h-full absolute z-20 flex justify-center items-center rounded-r-2xl duration-500 ease-out left-0">
-            <div class="card w-4/5 h-95">
+            <div class="card w-4/5 h-95  relative">
               <div class="header-card text-center pt-7 pb-10">
                 <h2 class="font-bold text-2xl">{{ headerSignIn }}</h2>
               </div>
@@ -158,7 +162,13 @@ function toggleCard(formSignUp) {
                     </a>
                   </div>
                 </form>
-
+              </div>
+              <div class="footer absolute bottom-0 w-full">
+                <button
+                  class="py-3 px-2 bg-yellow-500 w-full rounded-lg dark:text-white shadow-2xl cursor-pointer hover:bg-yellow-400"
+                  @click="home()">
+                  Lihat Barang
+                </button>
               </div>
             </div>
           </div>
