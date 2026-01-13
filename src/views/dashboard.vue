@@ -19,7 +19,8 @@ const titleList = ref('Daftar barang');
 const mataUang = ref('Rp .');
 const qty = ref(null);
 const updateFormItem = ref(null);
-const isGuest = ref(localStorage.getItem('isLogin') ? false : true)
+const isGuest = ref(localStorage.getItem('isLogin') ? false : true);
+import api from "./../services/api";
 
 const items = ref([])
 
@@ -99,11 +100,8 @@ const handleFile = (event) => {
 }
 
 async function getItems() {
-    const responseGetItems = await axios.get(`${import.meta.env.VITE_API_BASE_URL}items/`, {
-        params: {
-            take: 10
-        }
-    })
+    const responseGetItems = await api.get(`/items/?take=10`)
+    console.log(responseGetItems.data.data)
 
     items.value = responseGetItems.data.data.map(item => ({
         idItem: item.idItem,
